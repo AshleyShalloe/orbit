@@ -1,0 +1,256 @@
+<html>
+<head>
+    <title>Orbit</title>
+    <style>
+        html{
+            font-family: sans-serif;
+            background: black;
+        }
+        body{
+            display: grid;
+            align-content: center;
+            align-items: center;
+            justify-content: center;
+        }
+        .planet{
+            border: 0px solid white;
+            border-radius: 100%;
+            height: 2em;
+            width: 2em;
+            margin-right: 1em;
+        }
+        .orbit{
+            border-radius: 100%;
+            border: 1px solid gray;
+            width: 5em;
+            height: 5em;
+            grid-column-start: 1;
+            grid-row-start: 1;
+            display: flex;
+            align-items: center;
+        }
+        #solarSystem{
+            display: grid;
+            align-items: center;
+            justify-items: center;
+        }
+        #theSun{
+            background: yellow;
+            width: 1em;
+            height: 1em;
+            border-radius: 100%;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0px 0px 13px yellow;
+        }
+        #mercury{
+            background: radial-gradient(orange, yellow, red)
+        }
+        #venus{
+            background: radial-gradient(beige, gold)
+        }
+        #earth{
+            background: radial-gradient(green, skyblue)
+        }
+        #mars{
+            background: radial-gradient(red, brown, white);
+        }
+        #jupiter{
+            background: linear-gradient(beige, red, beige, orange, beige, red, brown)
+        }
+        #saturn{
+            background: linear-gradient(beige, gold, yellow, beige, goldenrod, gold)
+        }
+        #uranus{
+            background: radial-gradient(blue, skyblue, cyan, azure, lightblue)
+        }
+        #neptune{
+            background: radial-gradient(blue, skyblue, slategray, darkblue)
+        }
+        #pluto{
+            background: radial-gradient(grey, lightgray, slategray)
+        }
+        #year{
+            width: 4em;
+            text-align: center;
+            font-size: 1em;
+            background: white;
+            border-radius: 1em;
+        }
+        #controlbox{
+            position: fixed;
+            right: 1em;
+            bottom: 1em;
+            font-size: 2em;
+            text-align: center;
+            border-radius: 1em;
+            background: white;
+            padding-left: 0.5em;
+        }
+        #controlbox button{
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+
+<div id="solarSystem">
+    <div id="theSun"></div>
+    <div class="orbit">
+        <div class="planet" id="mercury"></div>
+    </div>
+
+    <div class="orbit">
+        <div class="planet" id="venus"></div>
+    </div>
+
+    <div class="orbit" style="transform: rotate(0deg)">
+        <div class="planet" id="earth"></div>
+    </div>
+
+    <div class="orbit">
+        <div class="planet" id="mars"></div>
+    </div>
+
+    <div class="orbit">
+        <div class="planet" id="jupiter"></div>
+    </div>
+
+    <div class="orbit">
+        <div class="planet" id="saturn"></div>
+    </div>
+
+    <div class="orbit">
+        <div class="planet" id="uranus"></div>
+    </div>
+
+    <div class="orbit">
+        <div class="planet" id="neptune"></div>
+    </div>
+
+    <div class="orbit">
+        <div class="planet" id="pluto"></div>
+    </div>
+</div>
+
+<div id="controlbox">
+    <button onclick="changeSpeed(0.5)">-</button>
+    Speed
+    <button onclick="changeSpeed(2)">+</button>
+    Year <input type="text" id="year" disabled>
+</div>
+
+</body>
+<script>
+'use strict'
+
+var planet_radius_in_km = {
+    "mercury":  2440,
+    "venus":    6052,
+    "earth":    6371,
+    "mars":     3390,
+    "jupiter":  69911,
+    "saturn":   58232,
+    "uranus":   25362,
+    "neptune":  24622,
+    "pluto":    1188
+}
+
+var planet_sidereal_day_in_solar_days_dict = {
+    "mercury":  87.9691,
+    "venus":	224.7,
+    "earth":	365.25636,
+    "mars": 	687,
+    "jupiter":	4331,
+    "saturn":	10747,
+    "uranus":	30589,
+    "neptune":	59800,
+    "pluto":	90560
+}
+
+function get_relative_angle_to_earth_dict(planet_sidereal_day_in_solar_days_dict){
+    var transformValue = parseFloat(document.getElementById("earth").parentElement.style.transform.split("(")[1].split("deg")[0])
+    var earthAngle = transformValue / 360 // percentage
+
+    for (var planet in planet_sidereal_day_in_solar_days_dict){
+        if (planet == "earth"){
+            continue
+        }
+        var relativeDay = planet_sidereal_day_in_solar_days_dict["earth"] / planet_sidereal_day_in_solar_days_dict[planet]
+        var relativeAngle = relativeDay * earthAngle * 360
+        document.getElementById(planet).parentElement.style.transform = `rotate(${relativeAngle}deg)`
+        document.getElementById(planet).style.transform = "translate" + document.getElementById(planet).style.transform.split("translate")[1].split(")")[0]  + ") " + `rotate(-${relativeAngle}deg)`
+    }
+}
+
+function get_planet_relative_radius_dict(planet_radius_in_km){
+    var return_dict = {}
+    for (var x in planet_radius_in_km){
+        var relative_radius = planet_radius_in_km[x] / planet_radius_in_km["earth"]
+        return_dict[x] = relative_radius
+    }
+    return return_dict
+}
+
+function size_planets(planet_radius_in_km){
+    var relative_radius_dict = get_planet_relative_radius_dict(planet_radius_in_km)
+
+    // weight the radii so it doesn't look stupid
+    var weighted_relative_radius_dict = {}
+    for (var x in relative_radius_dict){
+        var log_radius = Math.log(relative_radius_dict[x])
+        weighted_relative_radius_dict[x] = log_radius ? log_radius : 1 // earth is log(1) == 1, so we hardcode it to 1
+    }
+
+    // set the element dimensions
+    for (var planet in weighted_relative_radius_dict){
+        var relative_radius = weighted_relative_radius_dict[planet]
+        document.getElementById(planet).style.width = document.getElementById(planet).offsetWidth * relative_radius
+        document.getElementById(planet).style.height = document.getElementById(planet).offsetHeight * relative_radius
+        
+        // translate the planets left by half their width
+        document.getElementById(planet).style.transform = `translateX(-${document.getElementById(planet).offsetHeight / 2}px)`
+    }
+}
+
+
+function size_orbitals(multiplier){
+    multiplier = multiplier ? multiplier : 3;
+    for (var i=0; i<document.getElementsByClassName("orbit").length; i++){
+        document.getElementsByClassName("orbit")[i].style.width = document.getElementsByClassName("orbit")[i].offsetWidth * (i+1) * multiplier
+        document.getElementsByClassName("orbit")[i].style.height = document.getElementsByClassName("orbit")[i].offsetHeight * (i+1) * multiplier
+    }
+}
+
+function increment_earth_angle(){
+    var earthAngle = parseFloat(document.getElementById("earth").parentElement.style.transform.split("(")[1].split("deg")[0])
+    var newEarthAngle = earthAngle + ((360/60) * earth_orbit_speed)
+    document.getElementById("year").value = Math.floor(newEarthAngle / 360)
+    document.getElementById("earth").parentElement.style.transform = `rotate(${newEarthAngle}deg)`
+    get_relative_angle_to_earth_dict(planet_sidereal_day_in_solar_days_dict)
+}
+
+function changeSpeed(multiplier){
+    earth_orbit_speed = earth_orbit_speed * multiplier
+    if (earth_orbit_speed < 0.1){
+        earth_orbit_speed = 0.1
+    }
+    if (earth_orbit_speed > 100){
+        earth_orbit_speed = 100
+    }
+}
+
+setInterval(increment_earth_angle, 30);
+
+var earth_orbit_speed = 1
+
+function init(){
+    size_orbitals(2);
+    size_planets(planet_radius_in_km);
+}
+
+init();
+</script>
+</html>
