@@ -1,6 +1,7 @@
 <html>
 <head>
     <title>Orbit</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
     <style>
         html{
             font-family: sans-serif;
@@ -11,12 +12,13 @@
             align-content: center;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
         .planet{
             border: 0px solid white;
             border-radius: 100%;
-            height: 2em;
-            width: 2em;
+            height: 2vmin;
+            width: 2vmin;
             margin-right: 1em;
         }
         .orbit{
@@ -211,7 +213,7 @@ function size_planets(planet_radius_in_km){
     var weighted_relative_radius_dict = {}
     for (var x in relative_radius_dict){
         var log_radius = Math.log(relative_radius_dict[x])
-        weighted_relative_radius_dict[x] = log_radius ? log_radius : 1 // earth is log(1) == 1, so we hardcode it to 1
+        weighted_relative_radius_dict[x] = log_radius ? log_radius : 1 // earth is log(1) == 0, so we hardcode it to 1
     }
 
     // set the element dimensions
@@ -227,10 +229,12 @@ function size_planets(planet_radius_in_km){
 
 
 function size_orbitals(multiplier){
-    multiplier = multiplier ? multiplier : 3;
+    //multiplier = multiplier ? multiplier : 3;
     for (var i=0; i<document.getElementsByClassName("orbit").length; i++){
-        document.getElementsByClassName("orbit")[i].style.width = document.getElementsByClassName("orbit")[i].offsetWidth * (i+1) * multiplier
-        document.getElementsByClassName("orbit")[i].style.height = document.getElementsByClassName("orbit")[i].offsetHeight * (i+1) * multiplier
+        // document.getElementsByClassName("orbit")[i].style.width = document.getElementsByClassName("orbit")[i].offsetWidth * (i+1) * multiplier
+        // document.getElementsByClassName("orbit")[i].style.height = document.getElementsByClassName("orbit")[i].offsetHeight * (i+1) * multiplier
+        document.getElementsByClassName("orbit")[i].style.width = getShortestPageDimension() / 10 * (i+1)
+        document.getElementsByClassName("orbit")[i].style.height = getShortestPageDimension() / 10 * (i+1)
     }
 }
 
@@ -260,6 +264,10 @@ function changeSpeed(multiplier){
     if (earth_orbit_speed > 100){
         earth_orbit_speed = 100
     }
+}
+
+function getShortestPageDimension(){
+    return window.innerWidth < window.innerHeight ? window.innerWidth : window.innerHeight
 }
 
 setInterval(increment_earth_angle, 30);
