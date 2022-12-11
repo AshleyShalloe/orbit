@@ -104,10 +104,19 @@
             border: 1px solid black;
         }
         #👽{
-            font-size: 5em;
+            font-size: 15vmin;
             position: absolute;
-            top: 25%;
             right: 50%;
+        }
+        @media (orientation: portrait) {
+        #👽{
+            top: calc(50% - 30vmin);
+        }
+        }
+        @media (orientation: landscape) {
+            #👽{
+                top: 20vmin;
+            }
         }
     </style>
 </head>
@@ -285,6 +294,14 @@ function getShortestPageDimension(){
 function toggle_tractor_beam(){
     var tractor_beam_css = `
         <style id="tractor_beam_css">
+            @keyframes tractor_anim{
+                from{
+                    background: linear-gradient(transparent, rgba(0, 191, 255, 0.314));
+                }
+                to{
+                    background: rgba(0, 191, 255, 0.314);
+                }
+            }
             #👽::after{
                 width: 1em;
                 height: 1em;
@@ -292,9 +309,13 @@ function toggle_tractor_beam(){
                 top: 0.5em;
                 left: 0;
                 background: rgba(0, 191, 255, 0.314);
+                filter: blur(0.05em);
                 display: block;
                 content: "";
                 clip-path: polygon(50% 0, 100% 100%, 0% 100%, 0% 100%); border-bottom-left-radius: 50%; border-bottom-right-radius: 50%;
+                animation-name: tractor_anim;
+                animation-duration: 2s;
+                z-index: -10;
             }
         </style>
     `
@@ -328,7 +349,7 @@ async function abduct_earth(){
     }
 
     // wait for Earth to reach its nearest point
-    while (!(((parseFloat(document.getElementById("earth").parentElement.style.transform.split("(")[1].split("deg")[0]) % 360) > 80) && (parseFloat(document.getElementById("earth").parentElement.style.transform.split("(")[1].split("deg")[0]) % 360) < 100)){
+    while (!(((parseFloat(document.getElementById("earth").parentElement.style.transform.split("(")[1].split("deg")[0]) % 360) > 70) && (parseFloat(document.getElementById("earth").parentElement.style.transform.split("(")[1].split("deg")[0]) % 360) < 90)){
         console.log("waiting")
         await new Promise(r => setTimeout(r, 30));
     }
