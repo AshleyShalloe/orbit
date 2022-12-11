@@ -52,25 +52,33 @@
             background: radial-gradient(beige, gold)
         }
         #earth{
-            background: radial-gradient(green, skyblue)
+            background: radial-gradient(circle at 30% 30%,green, skyblue)
         }
         #mars{
             background: radial-gradient(red, brown, white);
         }
         #jupiter{
-            background: linear-gradient(beige, red, beige, orange, beige, red, brown)
+            background: linear-gradient(3.13deg, beige, red, beige, orange, beige, red, brown)
         }
         #saturn{
-            background: linear-gradient(beige, gold, yellow, beige, goldenrod, gold)
+            background: linear-gradient(26.7deg, beige, gold, yellow, beige, goldenrod, gold)
         }
         #uranus{
-            background: radial-gradient(blue, skyblue, cyan, azure, lightblue)
+            background: linear-gradient(97.77deg, teal, skyblue, teal, azure, cyan)
         }
         #neptune{
-            background: radial-gradient(blue, skyblue, slategray, darkblue)
+            background: linear-gradient(28.32deg, blue, darkblue, slategray, darkblue)
         }
         #pluto{
             background: radial-gradient(grey, lightgray, slategray)
+        }
+        .star{
+            width: 0.1vw;
+            height: 0.1vw;
+            background: white;
+            border-radius: 100%;
+            z-index: -20;
+            position: fixed;
         }
         #year{
             width: 4em;
@@ -134,6 +142,8 @@
         <div class="planet" id="pluto"></div>
     </div>
 </div>
+
+<div id="starfieldContainer"></div>
 
 <div id="controlbox">
     <button onclick="changeSpeed(0.5)">-</button>
@@ -232,6 +242,16 @@ function increment_earth_angle(){
     get_relative_angle_to_earth_dict(planet_sidereal_day_in_solar_days_dict)
 }
 
+function generateStarField(numberOfStars){
+	for (var i=0; i<numberOfStars; i++){
+		var xPos = 100 * Math.random()
+		var yPos = 100 * Math.random()
+		var starHtml = `<div class='star' style='left: ${xPos}%; top: ${yPos}%'></div>`
+		document.getElementById("starfieldContainer").innerHTML += starHtml
+	}
+}
+
+
 function changeSpeed(multiplier){
     earth_orbit_speed = earth_orbit_speed * multiplier
     if (earth_orbit_speed < 0.1){
@@ -249,6 +269,7 @@ var earth_orbit_speed = 1
 function init(){
     size_orbitals(2);
     size_planets(planet_radius_in_km);
+    generateStarField(100);
 }
 
 init();
