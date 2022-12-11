@@ -103,6 +103,12 @@
             font-size: 1em;
             border: 1px solid black;
         }
+        #👽{
+            font-size: 5em;
+            position: absolute;
+            top: 25%;
+            right: 50%;
+        }
     </style>
 </head>
 <body>
@@ -148,10 +154,13 @@
 
 <div id="starfieldContainer"></div>
 
+<div id="👽" style="filter: opacity(0); padding-right: 50vw">🛸</div>
+
 <div id="controlbox">
     <button onclick="changeSpeed(0.5)" style="border-top-left-radius: 1em; border-bottom-left-radius: 1em;">-</button>
     Speed
     <button onclick="changeSpeed(2)" style="border-top-right-radius: 1em; border-bottom-right-radius: 1em;">+</button>
+    <button onclick="abduct_earth(); this.style.display = 'none';" style="border-radius: 1em;">👽</button>
     Year <input type="text" id="year" disabled>
 </div>
 
@@ -271,6 +280,71 @@ function changeSpeed(multiplier){
 
 function getShortestPageDimension(){
     return window.innerWidth < window.innerHeight ? window.innerWidth : window.innerHeight
+}
+
+function toggle_tractor_beam(){
+    var tractor_beam_css = `
+        <style id="tractor_beam_css">
+            #👽::after{
+                width: 1em;
+                height: 1em;
+                position: absolute;
+                top: 0.5em;
+                left: 0;
+                background: rgba(0, 191, 255, 0.314);
+                display: block;
+                content: "";
+                clip-path: polygon(50% 0, 100% 100%, 0% 100%, 0% 100%); border-bottom-left-radius: 50%; border-bottom-right-radius: 50%;
+            }
+        </style>
+    `
+    if (document.getElementById("tractor_beam_css")){
+        document.getElementById("tractor_beam_css").remove();
+    }
+    else{
+        document.getElementsByTagName("head")[0].innerHTML += tractor_beam_css
+    }
+}
+
+async function abduct_earth(){
+    // disable cloaking agent
+    document.getElementById("👽").style.filter = ''
+    
+    // approach Terran orbit
+    var hang_around = true
+    var fly_in_interval = setInterval(function(){
+        if (parseInt(document.getElementById("👽").style.paddingRight.replace("vw", "")) > 0){
+            document.getElementById("👽").style.paddingRight = `${parseInt(document.getElementById("👽").style.paddingRight.replace("%", "")) - 1}vw`
+        }
+        else{
+            clearInterval(fly_in_interval)
+            hang_around = false
+            toggle_tractor_beam();
+        }
+    }, 30)
+
+    while (hang_around){
+        await new Promise(r => setTimeout(r, 30));
+    }
+
+    // wait for Earth to reach its nearest point
+    while (!(((parseFloat(document.getElementById("earth").parentElement.style.transform.split("(")[1].split("deg")[0]) % 360) > 80) && (parseFloat(document.getElementById("earth").parentElement.style.transform.split("(")[1].split("deg")[0]) % 360) < 100)){
+        console.log("waiting")
+        await new Promise(r => setTimeout(r, 30));
+    }
+    console.log("gotcha")
+    document.getElementById("earth").style.display = "none";
+    toggle_tractor_beam();
+
+    // lol bye
+    var fly_out_interval = setInterval(function(){
+        if (parseInt(document.getElementById("👽").style.paddingRight.replace("vw", "")) < 200){
+            document.getElementById("👽").style.paddingRight = `${parseInt(document.getElementById("👽").style.paddingRight.replace("%", "")) + 1}vw`
+        }
+        else{
+            clearInterval(fly_out_interval)
+        }
+    }, 15)
 }
 
 setInterval(increment_earth_angle, 30);
