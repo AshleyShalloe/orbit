@@ -93,14 +93,14 @@
             position: fixed;
             right: 1em;
             bottom: 1em;
-            font-size: 2em;
+            font-size: 1em;
             text-align: center;
             border-radius: 1em;
-            background: white;
-            padding-left: 0.5em;
+            color: white;
         }
         #controlbox button{
             font-size: 1em;
+            border: 1px solid black;
         }
     </style>
 </head>
@@ -148,9 +148,9 @@
 <div id="starfieldContainer"></div>
 
 <div id="controlbox">
-    <button onclick="changeSpeed(0.5)">-</button>
+    <button onclick="changeSpeed(0.5)" style="border-top-left-radius: 1em; border-bottom-left-radius: 1em;">-</button>
     Speed
-    <button onclick="changeSpeed(2)">+</button>
+    <button onclick="changeSpeed(2)" style="border-top-right-radius: 1em; border-bottom-right-radius: 1em;">+</button>
     Year <input type="text" id="year" disabled>
 </div>
 
@@ -219,8 +219,10 @@ function size_planets(planet_radius_in_km){
     // set the element dimensions
     for (var planet in weighted_relative_radius_dict){
         var relative_radius = weighted_relative_radius_dict[planet]
-        document.getElementById(planet).style.width = document.getElementById(planet).offsetWidth * relative_radius
-        document.getElementById(planet).style.height = document.getElementById(planet).offsetHeight * relative_radius
+        // document.getElementById(planet).style.width = document.getElementById(planet).offsetWidth * relative_radius
+        // document.getElementById(planet).style.height = document.getElementById(planet).offsetHeight * relative_radius
+        document.getElementById(planet).style.width = 2 * (getShortestPageDimension() / 100) * relative_radius // 2vmin
+        document.getElementById(planet).style.height = 2 *(getShortestPageDimension() / 100) * relative_radius
         
         // translate the planets left by half their width
         document.getElementById(planet).style.transform = `translateX(-${document.getElementById(planet).offsetHeight / 2}px)`
@@ -278,6 +280,7 @@ function init(){
     size_orbitals(2);
     size_planets(planet_radius_in_km);
     generateStarField(100);
+    addEventListener('resize', (event) => {size_planets(planet_radius_in_km); size_orbitals(2);})
 }
 
 init();
